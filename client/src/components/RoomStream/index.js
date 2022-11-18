@@ -13,6 +13,8 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 import clsx from "clsx";
 import { AiFillSound } from "react-icons/ai";
 import { CgLogOut } from "react-icons/cg";
+import { AGORA_TOKEN } from "../../service/helper";
+
 
 const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
@@ -33,7 +35,7 @@ const RoomStream = ({ userId }) => {
 
     client.on("user-left", handleUserLeft);
 
-    let UID = await client.join(process.env.REACT_APP_APP_ID, process.env.REACT_APP_CHANNEL, process.env.REACT_APP_TOKEN, +userId);
+    let UID = await client.join(process.env.REACT_APP_APP_ID, process.env.REACT_APP_CHANNEL, AGORA_TOKEN , userId);
 
     localTracksRef.current = await AgoraRTC.createMicrophoneAndCameraTracks();
 
