@@ -10,6 +10,11 @@ export const TEMPLATE_ID = "template_vo8xbhs"
 
 export const PUBLIC_KEY = "tsWskGPpf00sAjImx"
 
+
+
+export const AGORA_TOKEN = "007eJxTYOCx2+TUdpq5LEjk2Ybf/16y+Ho9XP3Aoc5mZfeSBOF1Xs8VGJLMk5NMjS1MjYxSDU3MjQwtzS2TLC3TzIwTjUySkowNH5aXJzcEMjK8eCXJyMgAgSA+C0NuYmYeAwMAXmsf9w=="
+
+
   export const handleTimer = (time) => {
     let results;
     let month;
