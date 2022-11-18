@@ -10,7 +10,6 @@ import { bindActionCreators } from "redux";
 import { actionCreator } from "../../redux";
 import { useDispatch, useSelector } from "react-redux";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import { APP_ID, CHANNEL, TOKEN } from "../../agoraConfig";
 import clsx from "clsx";
 import { AiFillSound } from "react-icons/ai";
 import { CgLogOut } from "react-icons/cg";
@@ -27,12 +26,14 @@ const RoomStream = ({ userId }) => {
   const localTracksRef = useRef([]);
   const remoteUsersRef = useRef({});
 
+
+
   const joinAndDisplayLocalStream = async () => {
     client.on("user-published", handleUserJoined);
 
     client.on("user-left", handleUserLeft);
 
-    let UID = await client.join(APP_ID, CHANNEL, TOKEN, +userId);
+    let UID = await client.join(process.env.REACT_APP_APP_ID, process.env.REACT_APP_CHANNEL, process.env.REACT_APP_TOKEN, +userId);
 
     localTracksRef.current = await AgoraRTC.createMicrophoneAndCameraTracks();
 
@@ -114,7 +115,6 @@ const RoomStream = ({ userId }) => {
     }
   };
 
-  console.log(isNavOption);
 
   useEffect(() => {
     joinStream();
