@@ -12,7 +12,7 @@ export const PUBLIC_KEY = "tsWskGPpf00sAjImx"
 
 
 
-export const AGORA_TOKEN = "007eJxTYFDy90uyyJZL+tHO8vbxXa29czlCOoJ1hdTUNBzsotbVfFFgSDJPTjI1tjA1Mko1NDE3MrQ0t0yytEwzM040MklKMjaMmled3BDIyFAYJ8rEyACBID4LQ25iZh4DAwA5zxtc"
+export const AGORA_TOKEN = "007eJxTYOiZtER15efGlvaS90VLKsLbZ7P5vfsZo/vyhKxT+Yoqe34FhiTz5CRTYwtTI6NUQxNzI0NLc8skS8s0M+NEI5OkJGPDZru7yQ2BjAwv/8cyMTJAIIjPwpCbmJnHwAAAiYcgRA=="
 
 
   export const handleTimer = (time) => {
