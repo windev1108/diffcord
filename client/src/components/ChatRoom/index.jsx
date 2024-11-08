@@ -4,9 +4,8 @@ import { FaBars, FaUserFriends } from 'react-icons/fa'
 import { TbMessagePlus } from 'react-icons/tb'
 import { IoIosSave } from 'react-icons/io'
 import {  BiHelpCircle } from 'react-icons/bi'
-import { ImBlocked } from 'react-icons/im'
 import { HiStatusOnline, HiUserAdd } from 'react-icons/hi'
-import { GoRequestChanges } from 'react-icons/go'
+// import { GoRequestChanges } from 'react-icons/go'
 import AllFriends from './AllFriends'
 import ListOnline from './ListOnline'
 import Modal from '../Modal/modalAddFriends'
@@ -82,7 +81,7 @@ const ChatRoom = () => {
         <div onClick={handleShowRequestList} className={clsx({ "bg-[#42464d]" : requestList }, "text-sm px-2 py-1  hover:bg-[#42464d] rounded-md")}>
             <div className="flex gap-2">
             <span className="lg:block hidden text-gray-300 cursor-pointer ">Requests</span>
-            <GoRequestChanges className="lg:hidden block text-white text-[20px]" />
+            {/* <GoRequestChanges className="lg:hidden block text-white text-[20px]" /> */}
             {myRequest > 0 && 
             <span className="text-[#fff] bg-[#ed4245] w-[18px] h-[18px] text-center text-xs mt-0 p-[1px] rounded-full">{myRequest}</span>
             }

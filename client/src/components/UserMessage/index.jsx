@@ -177,10 +177,6 @@ const UserMessage = () => {
 
   const handleDeleteMessage = (id) => {
     deleteMessage(id);
-    toast.success("Delete message success", {
-      autoClose: 3000,
-      theme: "dark",
-    });
   };
 
   const handleReplyMessage = (message) => {
@@ -225,7 +221,7 @@ const UserMessage = () => {
       <div className="relative h-full overflow-hidden">
         <div
           ref={messageContainerRef}
-          className="ml-3 lg:mx-4 flex flex-col-reverse overflow-y-scroll overflow-x-hidden h-[85%] mt-[3rem]"
+          className="ml-3 lg:mx-4 flex flex-col-reverse overflow-y-scroll overflow-x-hidden h-[calc(100%_-_108px)] mt-[3rem]"
         >
           {currentPercent > 0 && (
             <LoadingFile
@@ -485,7 +481,7 @@ const UserMessage = () => {
           onSubmit={(e) => handleSubmitMessage(e)}
           className={clsx(
             { "lg:rounded-b-lg": reply.name, "lg:rounded-lg": !reply.name },
-            "lg:relative rounded-top-lg fixed left-0 right-0 bottom-0  flex py-2  px-4 gap-3 bg-[#40444b] my-0 mt-0 lg:mt-2 mx-0 lg:mx-3 shadow-md"
+            "lg:absolute rounded-top-lg h-12 fixed left-0 right-0 bottom-2  flex py-2  px-4 gap-3 bg-[#40444b] my-0 mt-0 lg:mt-2 mx-0 lg:mx-3 shadow-md"
           )}
         >
           {reply.name && (
@@ -515,12 +511,12 @@ const UserMessage = () => {
           </div>
           <div className="w-[15%]">
             <div className="flex gap-3 py-1 float-right mx-3">
-              <BsFillMicFill className="text-[#b9bbbe] lg:block hidden text-2xl cursor-pointer" />
+              {/* <BsFillMicFill className="text-[#b9bbbe] lg:block hidden text-2xl cursor-pointer" />
               <FaGift className="text-[#b9bbbe] lg:block hidden text-2xl cursor-pointer" />
               <RiFileGifFill className="text-[#b9bbbe] lg:block hidden text-2xl cursor-pointer" />
               <div className="relative">
                 <FaStickyNote className="text-[#b9bbbe] lg:block hidden text-2xl cursor-pointer rotate-[270deg]" />
-              </div>
+              </div> */}
               <div className="relative">
                 <FaSmileBeam
                   onClick={handleShowEmoij}

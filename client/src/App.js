@@ -1,16 +1,13 @@
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { BrowserRouter , Routes, Route, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { BrowserRouter , Routes, Route } from 'react-router-dom';
 import { db } from './firebase/config';
 import { Home ,Signin, Signup , ChatBox , ChatRoom, ForgotPassword } from './pages'
 import { ActionType } from './redux/actions/action-types';
 
 function App() {
   const dispatch = useDispatch()
-   
-
-
   //  //  Fetch Channels
   useEffect(() => {
        const queryChannels = query( collection(db, "channels") , orderBy("timestamp", "desc"))

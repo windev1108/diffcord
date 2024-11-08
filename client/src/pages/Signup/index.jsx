@@ -160,7 +160,7 @@ const Signup = () => {
                    Already have an account ?
                   </span>
                   <Link className="lg:text-base text-sm text-theme" to="/signin">
-                   Signin
+                   Sign In
                   </Link>
                 </div>
               </div>

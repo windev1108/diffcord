@@ -113,6 +113,7 @@ const RoomMessage = () => {
   };
 
   const handleSubmitMessage = (e) => {
+    if(!message) return
     e.preventDefault();
     if (room.id) {
       const formData = {
@@ -195,10 +196,6 @@ const RoomMessage = () => {
 
   const handleDeleteMessage = (id) => {
     deleteMessage(id);
-    toast.success("Delete message successfully", {
-      autoClose: 3000,
-      theme: "dark",
-    });
   };
 
   const handleShowInfoDetail = (member) => {
@@ -251,7 +248,7 @@ const RoomMessage = () => {
         <div className="w-full h-screen overflow-hidden">
           <div className="flex h-full">
             <div className="lg:w-[80%] w-full relative overflow-hidden ">
-              <div className="ml-3 lg:mx-4 flex flex-col-reverse overflow-y-scroll h-[84%] overflow-x-hidden ">
+              <div className="ml-3 lg:mx-4 flex flex-col-reverse overflow-y-scroll h-[calc(100%_-_102px)] overflow-x-hidden ">
                 {room.id &&
                   filterMessages.map((data) => (
                     <div key={data.id}>
@@ -469,7 +466,7 @@ const RoomMessage = () => {
                   onSubmit={handleSubmitMessage}
                   className={clsx(
                     { "rounded-b-lg": reply.name, "rounded-lg": !reply.name },
-                    "relative bottom-0 left-0 right-0 flex py-2 px-4 gap-3 bg-[#40444b] my-0 lg:my-4 mx-3 shadow-md"
+                    "absolute bottom-12 h-12 left-0 right-0 flex py-2 px-4 gap-3 bg-[#40444b] mx-3 shadow-md"
                   )}
                 >
                   {reply.name && (
@@ -500,10 +497,10 @@ const RoomMessage = () => {
                   </div>
                   <div className="w-[15%]">
                     <div className="flex gap-3 py-1 float-right mx-3">
-                      <BsFillMicFill className="text-[#b9bbbe] text-2xl cursor-pointer lg:block hidden" />
+                      {/* <BsFillMicFill className="text-[#b9bbbe] text-2xl cursor-pointer lg:block hidden" />
                       <FaGift className="text-[#b9bbbe] text-2xl cursor-pointer lg:block hidden" />
                       <RiFileGifFill className="text-[#b9bbbe] text-2xl cursor-pointer lg:block hidden" />
-                      <FaStickyNote className="text-[#b9bbbe] text-2xl cursor-pointer lg:block hidden rotate-[270deg]" />
+                      <FaStickyNote className="text-[#b9bbbe] text-2xl cursor-pointer lg:block hidden rotate-[270deg]" /> */}
                       <div className="relative">
                         <FaSmileBeam
                           onClick={handleShowEmoij}
@@ -524,7 +521,7 @@ const RoomMessage = () => {
 
             <div className="lg:block hidden w-[20%] bg-[#2f3136] px-2 pt-6 overflow-y-scroll h-full">
               <div className="">
-                <span className="text-[#96989d]">Room master</span>
+                <span className="text-[#96989d]">Owner</span>
                 <div
                   onContextMenu={(e) => handleShowOptionMember(e, roomMaster)}
                   className="flex gap-2 my-1 hover:bg-[#36393f] py-1 px-2 cursor-pointer rounded-md h-[3rem]"

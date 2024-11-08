@@ -183,7 +183,7 @@ const Signin = () => {
                     Don't have an account ?
                   </span>
                   <Link className="lg:text-base text-sm text-theme" to="/signup">
-                    Signup now
+                    Sign Up now
                   </Link>
                 </div>
               </div>
