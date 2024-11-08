@@ -70,6 +70,7 @@ const RoomMessage = () => {
   const [filterMessages, setFilterMessages] = useState([]);
   const memberOptionRef = useRef();
   const messageRef = useRef();
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (room.id) {
@@ -124,11 +125,20 @@ const RoomMessage = () => {
         userId: sessionId,
         timestamp: serverTimestamp(),
       };
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       addMessage(formData);
       setMessage("");
       setReply({});
     }
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages?.length]);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView();
+  };
+
 
   const handleShowOptionMember = (e, member) => {
     if (e.nativeEvent.button === 0) {
@@ -701,8 +711,10 @@ const RoomMessage = () => {
                         </span>
                       )}
                     </div>
+                     <div ref={messagesEndRef}></div>
                   </div>
                 ))}
+
               </div>
             </div>
           </div>

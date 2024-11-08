@@ -57,6 +57,7 @@ const UserMessage = () => {
   const messagesEndRef = useRef(null);
   const messageRef = useRef();
   const messageContainerRef = useRef();
+
   // Check RoomUser
   const filterMessages =
     messages.length > 0 && userSelected
@@ -129,7 +130,7 @@ const UserMessage = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages?.length]);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView();
   };
