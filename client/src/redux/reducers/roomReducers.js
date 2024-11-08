@@ -2,7 +2,7 @@ import { ActionType } from '../actions/action-types'
 
 const inittialState = {
     rooms : [],
-    room: {}
+    room: {},
 }
 
 

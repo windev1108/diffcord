@@ -113,8 +113,8 @@ const RoomMessage = () => {
   };
 
   const handleSubmitMessage = (e) => {
-    if(!message) return
     e.preventDefault();
+    if(!message) return
     if (room.id) {
       const formData = {
         roomId: room.id,

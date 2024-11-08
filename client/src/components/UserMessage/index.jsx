@@ -110,6 +110,7 @@ const UserMessage = () => {
 
   const handleSubmitMessage = (e) => {
     e.preventDefault();
+    if(!message) return
     if (message && currentUser.id) {
       const formData = {
         roomId: user.id + sessionId,
