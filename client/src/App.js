@@ -5,10 +5,12 @@ import { BrowserRouter , Routes, Route } from 'react-router-dom';
 import { db } from './firebase/config';
 import { Home ,Signin, Signup , ChatBox , ChatRoom, ForgotPassword } from './pages'
 import { ActionType } from './redux/actions/action-types';
-import userReducers from './redux/reducers/userReducers';
 
 function App() {
   const dispatch = useDispatch()
+  const { users } = useSelector((state) => state.users);
+  const sessionId = sessionStorage.getItem("sessionId");
+
   //  //  Fetch Channels
   useEffect(() => {
        const queryChannels = query( collection(db, "channels") , orderBy("timestamp", "desc"))
@@ -31,6 +33,8 @@ function App() {
        const queryMessages = query(collection(db, "messages") , orderBy("timestamp", "desc"))
        const unsubMessages = onSnapshot(queryMessages,(snapshot) => {
          const results = snapshot.docs.map((doc) => ({...doc.data() , id: doc.id}))
+         console.log('message :',results[0])
+         console.log('users :',users)
             dispatch({ type: ActionType.FETCH_MESSAGES , payload : results })
        })
 

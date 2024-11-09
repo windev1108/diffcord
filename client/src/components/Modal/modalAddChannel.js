@@ -1,21 +1,20 @@
 import React, { memo, useEffect, useState } from "react";
 import { RiUploadCloudFill } from "react-icons/ri";
 import { addChannel, updateUser } from "../../service/CRUD";
-import { storage } from "../../firebase/config";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { ToastContainer, toast } from "react-toastify";
-import Progress from "../Progess";
 import { useSelector } from "react-redux";
 import { serverTimestamp } from "firebase/firestore";
+import { uploadImage } from "../../apis/cloudinary";
+import LoadingOverlay from "../LoadingOverlay";
+import { MEDIA_SUPPORT } from "../../utils/constants";
 
 const Modal = ({ setModal }) => {
   const sessionId = sessionStorage.getItem("sessionId");
   const { users } = useSelector((state) => state.users);
   const [file, setFile] = useState("");
-  const [percent, setPercent] = useState(0);
   const [name, setName] = useState("");
-  const [isLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [avatar, setAvatar] = useState();
 
   const currentUser = users.find((user) => user.id === sessionId);
@@ -33,7 +32,7 @@ const Modal = ({ setModal }) => {
     setFile(e.target.files[0]);
   };
 
-  const handleSubmitForm = (e) => {
+  const handleSubmitForm = async (e) => {
     e.preventDefault();
     if (!file) {
       toast.info("Please choose a file", {
@@ -46,46 +45,34 @@ const Modal = ({ setModal }) => {
         theme: "dark",
       });
     } else {
-      const storageRef = ref(storage, `/file/${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const percen = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-
-          // update progress
-          setPercent(percen);
-        },
-        (err) => console.log(err),
-        () => {
-          // download url
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            if (currentUser.id) {
-              const formChannel = {
-                channelId: uuidv4(),
-                name,
-                roomMaster: sessionId,
-                members: sessionId,
-                photoUrl: url,
-                timestamp: serverTimestamp(),
-              };
-              const formUser = {
-                ...currentUser,
-                channels: formChannel.channelId,
-              };
-              addChannel(formChannel);
-              updateUser(formUser, currentUser.id);
-              toast.success("Successful channel creation", {
-                autoclose: 3000,
-                theme: "dark",
-              });
-              setModal(false);
-            }
-          });
-        }
-      );
+      if(!MEDIA_SUPPORT.some((x) => file?.type.includes(x))){
+        toast.error('This file type is not supported!')
+        return
+      }
+      if (currentUser.id) {
+        setIsLoading(true)
+        const data = await uploadImage(file)
+        const formChannel = {
+          channelId: uuidv4(),
+          name,
+          roomMaster: sessionId,
+          members: sessionId,
+          photoUrl: data?.url,
+          timestamp: serverTimestamp(),
+        };
+        const formUser = {
+          ...currentUser,
+          channels: formChannel.channelId,
+        };
+        addChannel(formChannel);
+        updateUser(formUser, currentUser.id);
+        setIsLoading(false)
+        toast.success("Successful channel creation", {
+          autoclose: 3000,
+          theme: "dark",
+        });
+        setModal(false);
+      }
     }
   };
 
@@ -100,7 +87,7 @@ const Modal = ({ setModal }) => {
         onSubmit={handleSubmitForm}
         className="absolute my-0 mx-auto top-[20%] lg:top-[20%] left-[10%] lg:left-[35%] z-[61] bg-white w-[80%] lg:w-[440px] lg:h-auto h-[50%]"
       >
-        <Progress percent={percent} />
+        <LoadingOverlay visible={isLoading} />
         <div className="p-4">
           <span className="flex justify-center my-3 text-[#060607] text-lg font-semibold">
             Customize your server
@@ -171,7 +158,6 @@ const Modal = ({ setModal }) => {
             Back
           </span>
           <button
-            disabled={!isLoading ? true : false}
             type="submit"
             className="bg-[#5865F2] text-white px-8 py-1 rounded-sm"
           >

@@ -39,6 +39,8 @@ import LoadingFile from "./LoadingFile";
 import { bindActionCreators } from "redux";
 import { actionCreator } from "../../redux";
 import { useNavigate } from "react-router-dom";
+import { uploadImage } from "../../apis/cloudinary";
+import { MEDIA_SUPPORT } from "../../utils/constants";
 
 const UserMessage = () => {
   const dispatch = useDispatch();
@@ -57,6 +59,7 @@ const UserMessage = () => {
   const messagesEndRef = useRef(null);
   const messageRef = useRef();
   const messageContainerRef = useRef();
+  const [loading ,setLoading ] = useState(false)
 
   // Check RoomUser
   const filterMessages =
@@ -135,41 +138,30 @@ const UserMessage = () => {
     messagesEndRef.current?.scrollIntoView();
   };
 
-  const handleChangeFile = (e) => {
+  const handleChangeFile = async (e) => {
     const file = e.target.files[0];
-    const storageRef = ref(storage, `/file/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const percent = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        // update progress
-        setCurrentPercent(percent);
-      },
-      (err) => console.log(err),
-      () => {
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          if (file.name) {
-            const formData = {
-              roomId: user.id + sessionId,
-              userId: sessionId,
-              urlFile: url,
-              typeFile: file.type,
-              sizeFile: file.size,
-              nameFile: file.name,
-              reply,
-              name: currentUser.nickname,
-              timestamp: serverTimestamp(),
-            };
-            setReply({});
-            addMessage(formData);
-          }
-        });
-      }
-    );
+    if(!MEDIA_SUPPORT.some((x) => file?.type.includes(x))){
+      toast.error('This file type is not supported!')
+      return
+    }
+    if (file.name) {
+      setLoading(true)
+      const data = await uploadImage(file)
+      const formData = {
+        roomId: user.id + sessionId,
+        userId: sessionId,
+        urlFile: data?.url ?? '',
+        typeFile: file.type,
+        sizeFile: file.size,
+        nameFile: file.name,
+        reply,
+        name: currentUser.nickname,
+        timestamp: serverTimestamp(),
+      };
+      setReply({});
+      setLoading(false)
+      addMessage(formData);
+    }
   };
 
   const getImage = (id) => {

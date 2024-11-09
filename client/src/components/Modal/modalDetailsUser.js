@@ -11,10 +11,8 @@ import {
   BsRecordCircleFill,
   BsThreeDotsVertical,
 } from "react-icons/bs";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { storage } from "../../firebase/config";
 import { useDispatch, useSelector } from "react-redux";
-import Progess from "../Progess";
+import LoadingOverlay from "../LoadingOverlay";
 import { typeImage } from "../../service/helper";
 import Notification from "../Notification";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +20,9 @@ import { bindActionCreators } from "redux";
 import { actionCreator } from "../../redux";
 import clsx from "clsx";
 import { serverTimestamp } from "firebase/firestore";
+import { destroyImage, uploadImage } from "../../apis/cloudinary";
+import ModalSettingProfile from './modalSettingProfile'
+import { MEDIA_SUPPORT } from "../../utils/constants";
 
 const Modal = ({ setModal, user }) => {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ const Modal = ({ setModal, user }) => {
   const [note, setNote] = useState("");
   const [nickname , setNickname] = useState("");
   const [percent, setPercent] = useState(0);
+  const [ loading , setLoading ] = useState(false)
 
   useEffect(() => {
     const results = requests.filter((request) => request.from === sessionId);
@@ -52,64 +54,39 @@ const Modal = ({ setModal, user }) => {
     setCurrentUser(results);
   }, [users]);
 
-  const handleSubmitNote = (e) => {
-    e.preventDefault();
-    const formUser = {
-      ...user,
-      note,
-    };
-    updateUser(formUser, user.id);
-    toast.info("Update note success", {
-      autoClose: 3000,
-      theme: "dark",
-    });
-  };
 
-  const handleSubmitName = (e) => {
-    e.preventDefault()
-    const formUser = {
-      ...user,
-      nickname
-    };
-    updateUser(formUser, user.id);
-    toast.info("Update name success", {
-      autoClose: 3000,
-      theme: "dark",
-    });
-  }
-
-  const handleChangeAvatar = (e) => {
+  const handleChangeAvatar = async (e) => {
     const file = e.target.files[0];
-    const storageRef = ref(storage, `/file/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const percent = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-
-        // update progress
-        setPercent(percent);
-      },
-      (err) => console.log(err),
-      () => {
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          if (currentUser.id) {
-            const formUser = {
-              ...currentUser,
-              avatar: url,
-            };
-            updateUser(formUser, currentUser.id);
-            toast.success("Change avatar success", {
-              autoClose: 3000,
-              theme: "dark",
-            });
-          }
+    if(!MEDIA_SUPPORT.some((x) => file?.type.includes(x))){
+      toast.error('This file type is not supported!')
+      return
+    }
+    setLoading(true)
+    const data = await uploadImage(file)
+    if(data?.url){
+      // if(currentUser.avatarPublicId){
+      //   const res = await destroyImage(currentUser.avatarPublicId)
+      //   console.log('res :',res)
+      // }
+      if (currentUser.id) {
+        const formUser = {
+          ...currentUser,
+          avatar: data.url,
+          avatarPublicId: data?.public_id
+        };
+        updateUser(formUser, currentUser.id);
+        setLoading(false)
+        toast.success("Upload avatar successfully!", {
+          autoClose: 3000,
+          theme: "dark",
         });
       }
-    );
+
+    }else {
+      toast.error("Upload avatar failed", {
+        autoClose: 3000,
+        theme: "dark",
+      })}
   };
 
   useMemo(() => {
@@ -136,14 +113,17 @@ const Modal = ({ setModal, user }) => {
   }
   return (
     <>
-      <Progess percent={percent} />
       <div
         onClick={() => setModal(false)}
         className="fixed top-0 left-0 bottom-0 right-0 bg-[#080809] z-20 bg-opacity-50"
-      ></div>
+      >
+
+      </div>
       <Notification />
     
-      <div className="fixed lg:top-[20%] lg:left-[30%]  left-0 right-0 bottom-0 z-30 w-full lg:w-[40rem]  bg-[#18191c] h-[60%] lg:h-[30rem] shadow-md">
+      <div className="fixed lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2  left-0 right-0 bottom-0 z-30 w-full lg:w-[40rem] rounded-md bg-[#18191c] h-[60%] lg:h-[30rem] shadow-md">
+      <LoadingOverlay visible={loading} />
+       
         <div className="relative h-[8rem] rounded-lg">
           <div
             style={
@@ -156,20 +136,23 @@ const Modal = ({ setModal, user }) => {
             className="flex justify-end h-full"
           >
             {user.id === sessionId && (
-              <label onChange={handleChangeAvatar} htmlFor="changeAvatar">
-                <input hidden id="changeAvatar" type="file" accept="image/*" />
+              <ModalSettingProfile user={user} >
+                <button>
                 <BsFillPencilFill className="bg-black bg-opacity-30 text-white mt-3 mr-3 rounded-full  text-4xl p-1 cursor-pointer" />
-              </label>
+                </button>
+              </ModalSettingProfile>
             )}
           </div>
 
           <div className="absolute top-[3.5rem] left-[1.5rem]">
+            <label onChange={handleChangeAvatar} htmlFor="changeAvatar" title='Upload avatar'>
+            <input hidden id="changeAvatar" type="file" accept="image/*" />
             {currentUser.avatar && currentUser.avatar.includes(typeImage) ? (
-              <img
-                className="border-[8px] border-[#18191c] text-white w-[140px] h-[140px] rounded-full cursor-pointer"
-                src={currentUser.avatar}
-                alt=""
-              />
+                <img
+                  className="border-[8px] border-[#18191c] text-white w-[140px] h-[140px] rounded-full cursor-pointer"
+                  src={currentUser.avatar}
+                  alt=""
+                />
             ) : (
               <FaDiscord
                 style={
@@ -182,6 +165,8 @@ const Modal = ({ setModal, user }) => {
                 className="border-[8px] border-[#18191c] text-white w-[140px] h-[140px] p-[20px] rounded-full cursor-pointer"
               />
             )}
+              </label>
+
 
             {currentUser.status === "online" && (
               <BsCircleFill className="absolute bottom-[10px] right-[8px] w-[40px] h-[40px] text-[#3ba55d] bg-[#18191c] rounded-full text-sm p-[8px]" />
@@ -232,31 +217,19 @@ const Modal = ({ setModal, user }) => {
             "relative p-6 mt-3 border-b-[1px] border-[#33353b]"
           )}
         >
-          <div className="flex-row items-center space-x-1">
+          <div className="flex-row items-center space-x-1 mt-4">
             <span className="text-[#b9bbbe] font-bold text-xl  max-h-[2rem]">
               {currentUser.nickname}
             </span>
           <span className="text-[#b9bbbe] font-bold text-xl mt-2 ">{`#${currentUser.uid}`}</span>
           </div>
         </div>
-        <form onSubmit={handleSubmitNote} className="relative px-6 py-4">
+        <div className="relative px-6 py-4">
           <span className="text-[#b9bbbe] text-sm font-bold flex">NOTE</span>
-          {currentUser.id !== sessionId ? (
             <span className="flex bg-transparent text-base outline-none mt-2 text-[#b9bbbe] w-full max-h-[2rem]">
               {currentUser.note || "No notes yet"}
             </span>
-          ) : (
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              className="flex bg-transparent text-base outline-none mt-2 text-[#b9bbbe] w-full max-h-[2rem]"
-              type="text"
-              placeholder={
-                currentUser.note ? currentUser.note : "Click to add notes"
-              }
-            />
-          )}
-        </form>
+        </div>
       </div>
     </>
   );

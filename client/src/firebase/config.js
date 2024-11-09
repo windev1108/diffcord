@@ -10,14 +10,14 @@ import firebase from 'firebase/compat/app';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const app =  firebase.initializeApp({
-  apiKey:"AIzaSyBeHdiDzW3YdjqtdkQR2gyxZovSCguH86E",
-  authDomain:"discord-6e069.firebaseapp.com",
-  appId:"1:931526430448:web:ec44992d5e47446d893c35",
-  databaseURL:"https://discord-6e069-default-rtdb.firebaseio.com",
-  projectId:"discord-6e069",
-  storageBucket:"discord-6e069.appspot.com",
-  messagingSenderId:"931526430448",
-  measurementId:"G-G8GXTF79DB"
+  apiKey: "AIzaSyC9CkKvvs0o7c3hv6O5ID7uemQ-Y7a8RMs",
+  authDomain: "winchat-206bf.firebaseapp.com",
+  databaseURL: "https://winchat-206bf-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "winchat-206bf",
+  storageBucket: "winchat-206bf.firebasestorage.app",
+  messagingSenderId: "396424793479",
+  appId: "1:396424793479:web:e82e17dba5fb43a0b89722",
+  measurementId: "G-EWRS3QR6EZ"
 });
 
 // Initialize Firebase

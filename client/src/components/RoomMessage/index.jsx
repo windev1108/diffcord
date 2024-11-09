@@ -45,6 +45,8 @@ import { bindActionCreators } from "redux";
 import { actionCreator } from "../../redux";
 import Modal from "../Modal/modalDetailsUser";
 import { useNavigate } from "react-router-dom";
+import { uploadImage } from "../../apis/cloudinary";
+import { MEDIA_SUPPORT } from "../../utils/constants";
 
 const RoomMessage = () => {
   const dispatch = useDispatch();
@@ -64,7 +66,7 @@ const RoomMessage = () => {
   const [currentMemberOption, setCurrentMemberOption] = useState(null);
   const [showModalDetailUser, setShowModalDetailUser] = useState(false);
   const [currentMember, setCurrentMember] = useState({});
-  const [percent, setPercent] = useState(0);
+  const [loading ,setLoading ] = useState()
   const [file, setFile] = useState();
   const [reply, setReply] = useState({});
   const [filterMessages, setFilterMessages] = useState([]);
@@ -125,20 +127,11 @@ const RoomMessage = () => {
         userId: sessionId,
         timestamp: serverTimestamp(),
       };
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       addMessage(formData);
       setMessage("");
       setReply({});
     }
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages?.length]);
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView();
-  };
-
 
   const handleShowOptionMember = (e, member) => {
     if (e.nativeEvent.button === 0) {
@@ -148,43 +141,30 @@ const RoomMessage = () => {
     }
   };
 
-  const handleChangeFile = (e) => {
+  const handleChangeFile =  async (e) => {
     const file = e.target.files[0];
+    if(!MEDIA_SUPPORT.some((x) => file?.type.includes(x))){
+      return
+    }
     setFile(e.target.files);
-    const storageRef = ref(storage, `/file/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const percent = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-
-        // update progress
-        setPercent(percent);
-      },
-      (err) => console.log(err),
-      () => {
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          if (file.name) {
-            const formData = {
-              roomId: room.id,
-              userId: sessionId,
-              urlFile: url,
-              typeFile: file.type,
-              sizeFile: file.size,
-              nameFile: file.name,
-              reply,
-              name: currentUser.nickname,
-              timestamp: serverTimestamp(),
-            };
-            setReply({});
-            addMessage(formData);
-          }
-        });
-      }
-    );
+    if (file.name) {
+      setLoading(true)
+      const res = await uploadImage(file)
+      const formData = {
+        roomId: room.id,
+        userId: sessionId,
+        urlFile: res?.url ?? '',
+        typeFile: file.type,
+        sizeFile: file.size,
+        nameFile: file.name,
+        reply,
+        name: currentUser.nickname,
+        timestamp: serverTimestamp(),
+      };
+      setReply({});
+      setLoading(false)
+      addMessage(formData);
+    }
   };
 
   const handleDeleteMember = (member) => {
@@ -232,6 +212,15 @@ const RoomMessage = () => {
   const handleHideNavBarMobile = () => {
     setRoom({});
   };
+  
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages?.length]);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView();
+  };
+
+
   return (
     <>
       {showModalDetailUser && (
@@ -240,7 +229,7 @@ const RoomMessage = () => {
       <div
         className={clsx(
           { "translate-x-[-15%] !opacity-100": room.id },
-          "lg:relative z-10 lg:w-[83.8%]  w-[100%] fixed transition-all  duration-500 lg:opacity-100  opacity-0 h-screen lg:translate-x-0 translate-x-[100%]  bg-[#36393f]"
+          "lg:relative z-10 lg:w-[83.8%]  w-[100%] fixed transition-all duration-500 lg:opacity-100  opacity-0 h-screen lg:translate-x-0 translate-x-[100%]  bg-[#36393f]"
         )}
       >
         <Notification />
@@ -255,9 +244,8 @@ const RoomMessage = () => {
             {room.name ? room.name : "Please choose a room to chat"}
           </span>
         </div>
-        <div className="w-full h-screen overflow-hidden">
           <div className="flex h-full">
-            <div className="lg:w-[80%] w-full relative overflow-hidden ">
+            <div className="lg:w-[80%] w-full relative overflow-y-hidden">
               <div className="ml-3 lg:mx-4 flex flex-col-reverse overflow-y-scroll h-[calc(100%_-_102px)] overflow-x-hidden ">
                 {room.id &&
                   filterMessages.map((data) => (
@@ -376,7 +364,7 @@ const RoomMessage = () => {
                             </span>
                           </div>
 
-                          <div className="flex w-[20rem] max-h-[25rem]">
+                          <div className="flex w-full max-h-[25rem]">
                             {data.typeFile && data.typeFile.includes("image") && (
                               <img
                                 className={clsx(
@@ -460,7 +448,7 @@ const RoomMessage = () => {
                             )}
 
                             {!data.typeFile && (
-                              <span className="break-words text-[14px] w-[20rem] text-[#ccddd9]">
+                              <span className="break-words text-[14px] w-[80%] text-[#ccddd9]">
                                 {data.message}
                               </span>
                             )}
@@ -549,7 +537,7 @@ const RoomMessage = () => {
                             "hover:bg-[#4752c4] hover:text-[#fff] rounded-t-md  flex text-[#a1a3a6] font-semibold p-2"
                           )}
                         >
-                          Hồ sơ
+                          Profile
                         </div>
 
                         {roomMaster.id !== sessionId && (
@@ -563,7 +551,7 @@ const RoomMessage = () => {
                               "hover:bg-[#4752c4] hover:text-[#fff]  flex text-[#a1a3a6] font-semibold p-2"
                             )}
                           >
-                            Nhắn tin
+                            Send message
                           </div>
                         )}
                       </div>
@@ -718,7 +706,6 @@ const RoomMessage = () => {
               </div>
             </div>
           </div>
-        </div>
         <ToastContainer />
       </div>
     </>

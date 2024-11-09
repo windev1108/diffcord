@@ -103,7 +103,7 @@ export const PUBLIC_KEY = "tsWskGPpf00sAjImx"
     return `${hours}:${min} `
   } 
 
-  export const typeImage =  "https://firebasestorage.googleapis.com/v0/b/discord-6e069.appspot.com/o/file%"
+  export const typeImage =  "image"
   
 export const TYPE_NUMBER =  "0"|1||2||3||4||5||6||7||8||9
 
@@ -139,3 +139,16 @@ export const formatDate = (timestamp) => {
 
   return formatter.format("DD MMM YYYY h:mm A");
 };
+
+export const mappingMediaType = (type) => {
+   switch (type) {
+    case 'image':
+      return 'image'
+    case 'video':
+      return 'video'
+   case 'raw':
+      return 'raw'
+    default:
+      return 'auto'
+   }
+}
