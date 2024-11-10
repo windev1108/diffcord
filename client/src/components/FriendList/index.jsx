@@ -27,24 +27,20 @@ const FriendList = () => {
   const { users, user } = useSelector((state) => state.users);
   const { requests} = useSelector((state) => state.requests);
   const currentUser = sessionId && users.find((user) => user.id === sessionId);
-  const [usersFilter, setUserFilter] = useState([]);
   const [currentUserActive, setCurrentUserActive] = useState(null);
-  const [currentUserOption, setCurremtUserOption] = useState(null);
+  const [currentUserOption, setCurrentUserOption] = useState(null);
   const [showModalDetailUser, setShowModalDetailUser] = useState(false);
-  const [ myRequest , setMyRequest ] = useState(0)
   const optionUserRef = useRef();
 
-  useMemo(() => {
-    const results = requests.filter(request => request.to === sessionId)
-    setMyRequest(results.length) 
-},[requests])
-
+  const myRequest =  useMemo(() => {
+    return requests.filter(request => request.to === sessionId)
+},[requests, sessionId])
 
   useEffect(() => {
     const unListen = (e) => {
       const checkContainer = e.composedPath().some((p) => p === optionUserRef.current);
       if (!checkContainer) {
-        setCurremtUserOption(null);
+        setCurrentUserOption(null);
       }
     };
     window.addEventListener("click", unListen);
@@ -53,11 +49,9 @@ const FriendList = () => {
     };
   }, [currentUserOption]);
 
-  useEffect(() => {
-    const results =
-      users && users.filter((user) => currentUser?.friends.includes(user.id));
-    setUserFilter(results);
-  }, [users]);
+  const usersFilter = useMemo(() => {
+      return users?.filter((user) => currentUser?.friends.includes(user.id)) ?? []
+  }, [currentUser?.friends, users]);
 
   const handleSelectUser = (e, user) => {
     if (e.nativeEvent.button === 0) {
@@ -65,14 +59,14 @@ const FriendList = () => {
       navigate(`/channels/@me/${user.nickname}`);
       setCurrentUserActive(user.id);
     } else if (e.nativeEvent.button === 2) {
-      setCurremtUserOption(user.id);
+      setCurrentUserOption(user.id);
     }
   };
 
   const handleShowInfoDetail = async (user) => {
     setUser(user);
     setShowModalDetailUser(true);
-    setCurremtUserOption(null);
+    setCurrentUserOption(null);
   };
 
   const handleDeleteFriend = (user) => {
@@ -110,8 +104,8 @@ const FriendList = () => {
         <div onClick={showListFriends} className="cursor-pointer flex gap-3 py-2 px-5 rounded-md bg-[#42464d]">
           <FaUserFriends className="text-white text-[18px]" />
           <span className="text-white text-sm font-medium ">Friends</span>
-          {myRequest > 0 && 
-            <span className="text-[#fff] bg-[#ed4245] w-[18px] h-[18px] text-center text-xs mt-0 p-[1px] rounded-full">{myRequest}</span>
+          {myRequest?.length > 0 && 
+            <span className="text-[#fff] bg-[#ed4245] w-[18px] h-[18px] text-center text-xs mt-0 p-[1px] rounded-full">{myRequest?.length}</span>
             }
         </div>
         <div className="flex justify-between my-4 mx-2">

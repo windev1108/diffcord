@@ -17,6 +17,13 @@ export const setUser =  (user) => {
    }
 }
 
+export const setAuthUser =  (user) => {
+   return {
+      type: ActionType.SET_AUTH_USER,
+      payload: user
+   }
+}
+
 export const setRoom =  (room) => {
    return {
       type: ActionType.SET_ROOM,

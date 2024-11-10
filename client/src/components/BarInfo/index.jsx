@@ -26,7 +26,7 @@ const BarInfo = ({ audio }) => {
   const sessionId = sessionStorage.getItem("sessionId");
   const { users, user } = useSelector((state) => state.users);
   const { room } = useSelector((state) => state.rooms);
-  const { setChannel } = bindActionCreators(actionCreator, dispatch);
+  const { setChannel, setAuthUser } = bindActionCreators(actionCreator, dispatch);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState([]);
   const [showOptionInfo, setShowOptionInfo] = useState(false);
@@ -66,7 +66,8 @@ const BarInfo = ({ audio }) => {
   const handleLogout = () => {
     navigate("/signin");
     sessionStorage.removeItem("sessionId");
-    updateUser({ ...currentUser, status: "offline" }, currentUser.id);
+    updateUser({ status: "offline" }, currentUser.id);
+    setAuthUser({})
     setChannel({});
   };
 

@@ -19,9 +19,8 @@ import { toast } from "react-toastify";
 import Notification from "../Notification";
 import { AiFillSound, AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
-import ModalSettingChannel from "../Modal/modalSettingChannel";
 import ModalInvite from "../Modal/modalInvite";
-import AgoraRTC from "agora-rtc-sdk-ng";
+import ModalDetailsChannel from "../Modal/modalDetailsChannel";
 
 const RoomList = () => {
   const dispatch = useDispatch();
@@ -130,7 +129,7 @@ const RoomList = () => {
           {showModalInvite && <ModalInvite setModal={setShowModalInvite} />}
           {showModalAddRoom && <ModalAddRoom setModal={setShowModalAddRoom} />}
           {showModalSettingChannel && (
-            <ModalSettingChannel setModal={setShowModalSettingChannel} />
+            <ModalDetailsChannel setModal={setShowModalSettingChannel} />
           )}
           <div className="relative flex justify-between p-[.68rem] shadow-md h-[44px]">
             <span className="font-bold text-[#fff]">

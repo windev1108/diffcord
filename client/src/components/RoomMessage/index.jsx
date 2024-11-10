@@ -169,16 +169,14 @@ const RoomMessage = () => {
 
   const handleDeleteMember = (member) => {
     const formChannel = {
-      ...channel,
       members: channel.members.replace(member.id, ""),
     };
     const formUser = {
-      ...member,
       channels: member.channels.replace(channel.channelId, ""),
     };
     updateChannel(formChannel, channel.id);
     updateUser(formUser, member.id);
-    toast.success("Delete member successfully", {
+    toast.success("Remove member successfully", {
       autoClose: 3000,
       theme: "dark",
     });
@@ -213,12 +211,12 @@ const RoomMessage = () => {
     setRoom({});
   };
   
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages?.length]);
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView();
-  };
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [messages?.length]);
+  // const scrollToBottom = () => {
+  //   messagesEndRef.current?.scrollIntoView();
+  // };
 
 
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import { BiSearch } from "react-icons/bi";
 import { FaDiscord } from "react-icons/fa";
@@ -9,24 +9,17 @@ import { deleteRequest, updateChannel, updateUser } from "../../service/CRUD";
 import { toast } from "react-toastify";
 import Notification from "../Notification";
 
-function Request({ setMyRequest }) {
+function Request() {
   const sessionId = sessionStorage.getItem("sessionId");
   const { requests } = useSelector((state) => state.requests);
   const { users } = useSelector((state) => state.users);
   const { channels } = useSelector((state) => state.channels);
   const [formSearch, setFormSearch] = useState("");
-  const [requestFilter, setRequestFilter] = useState([]);
 
-  useEffect(() => {
-    const results = requests.filter(
-      (request) => request.to === sessionId || request.from === sessionId
-    );
-    const myCountRequest = requests.filter(
-      (request) => request.to === sessionId
-    );
-    setRequestFilter(results);
-    setMyRequest(myCountRequest.length);
-  }, [requests]);
+  const requestFilter = useMemo(() => {
+    return requests.filter(request => request.to === sessionId) ?? []
+},[requests, sessionId])
+
 
   const getUser = (id) => {
     const user = users.find((user) => user.id === id);
@@ -44,11 +37,9 @@ function Request({ setMyRequest }) {
     const channel = getChannel(request.channelId) 
     if (request.action === "addFriend") {
       const formUserFrom = {
-        ...userFrom,
         friends: userFrom.friends.concat(userTo.id),
       };
       const formUserTo = {
-        ...userTo,
         friends: userTo.friends.concat(userFrom.id),
       };
       updateUser(formUserFrom, userFrom.id);
@@ -61,11 +52,9 @@ function Request({ setMyRequest }) {
     } else if (request.action === "addChannel") {
       // do something
       const formUser = {
-         ...userTo,
          channels : userTo.channels.concat(channel.channelId)
       }
       const formChannel = {
-        ...channel,
          members: channel.members.concat(userTo.id)
       }
       updateUser(formUser,userTo.id)
@@ -85,7 +74,7 @@ function Request({ setMyRequest }) {
   return (
     <>
       <Notification />
-      {requestFilter.length > 0 ? (
+      {requestFilter?.length > 0 ? (
         <div className="p-3 px-6">
           <div className="flex mx-2 justify-between bg-[#202225] rounded-sm">
             <input

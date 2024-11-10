@@ -8,20 +8,23 @@ import { ActionType } from './redux/actions/action-types';
 
 function App() {
   const dispatch = useDispatch()
-  const { users } = useSelector((state) => state.users);
+  const { users, authUser } = useSelector((state) => state.users);
+  const { channels } = useSelector((state) => state.channels);
+  const { rooms } = useSelector((state) => state.rooms);
   const sessionId = sessionStorage.getItem("sessionId");
-
   //  //  Fetch Channels
   useEffect(() => {
        const queryChannels = query( collection(db, "channels") , orderBy("timestamp", "desc"))
        const unsubChannels = onSnapshot(queryChannels,(snapshot) => {
           const results = snapshot.docs.map((doc) => ({...doc.data() , id: doc.id}))
-            dispatch({ type: ActionType.FETCH_CHANNELS , payload : results })
+         dispatch({ type: ActionType.FETCH_CHANNELS , payload : [...results] })
        })
        const queryUsers = query(collection(db, "users") , orderBy("timestamp", "desc"))
        const unsubUsers = onSnapshot(queryUsers,(snapshot) => {
           const results = snapshot.docs.map((doc) => ({...doc.data() , id: doc.id}))
-            dispatch({ type: ActionType.FETCH_USERS , payload : results })
+          const authUser = results?.find((x) => x.id === sessionId)
+          dispatch({ type: ActionType.SET_AUTH_USER , payload : authUser  })
+          dispatch({ type: ActionType.FETCH_USERS , payload : [...results] })
        })
 
        const queryRooms = query(collection(db, "rooms") , orderBy("timestamp", "desc"))
@@ -33,15 +36,13 @@ function App() {
        const queryMessages = query(collection(db, "messages") , orderBy("timestamp", "desc"))
        const unsubMessages = onSnapshot(queryMessages,(snapshot) => {
          const results = snapshot.docs.map((doc) => ({...doc.data() , id: doc.id}))
-         console.log('message :',results[0])
-         console.log('users :',users)
-            dispatch({ type: ActionType.FETCH_MESSAGES , payload : results })
+         dispatch({ type: ActionType.FETCH_MESSAGES , payload : results })
        })
 
        const queryRequest = query(collection(db, "requests") , orderBy("timestamp", "desc"))
        const unsubRequest = onSnapshot(queryRequest,(snapshot) => {
           const results = snapshot.docs.map((doc) => ({...doc.data() , id: doc.id}))
-            dispatch({ type: ActionType.FETCH_REQUEST , payload : results })
+          dispatch({ type: ActionType.FETCH_REQUEST , payload : results })
        })
        return () => {
         unsubRequest()

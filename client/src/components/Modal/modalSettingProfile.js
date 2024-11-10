@@ -26,7 +26,6 @@ const isNotChangeValues = useMemo(() => {
     } 
     setLoading(true)
     await updateUser({
-      ...user,
       nickname: fullName,
       uid: username,
       note

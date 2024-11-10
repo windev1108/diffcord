@@ -1,4 +1,4 @@
-import { setDoc , doc, deleteDoc, addDoc, collection} from "firebase/firestore";
+import { doc, deleteDoc, addDoc, collection, updateDoc} from "firebase/firestore";
 import { db } from "../firebase/config";
 
 
@@ -26,13 +26,13 @@ export const addChannel = (channel) => {
 
 export const updateChannel = async (payload, id) => {
   const docRef = doc(db, "channels", id);
-  await setDoc(docRef, payload);
+  await updateDoc(docRef, payload);
 };
 
 
  export const updateUser = async (payload, id) => {
     const docRef = doc(db, "users", id);
-    await setDoc(docRef, payload);
+    await updateDoc(docRef, payload);
   };
 
 

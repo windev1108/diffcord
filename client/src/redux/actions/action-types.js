@@ -6,6 +6,7 @@ export const ActionType = {
     FETCH_REQUEST: 'fetch_request',
     GET_CHANNELS : "get_channels",
     SET_USER : "set_user",
+    SET_AUTH_USER: "set_auth_user",
     SET_CHANNEL: "set_channel",
     SET_ROOM: "set_room",
     SET_ROOMMASTER: "set_roommaster",

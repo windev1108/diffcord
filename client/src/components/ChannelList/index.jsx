@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaDiscord } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -16,11 +16,11 @@ const ChannelList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { setChannel, setRoom , setUser} = bindActionCreators(actionCreator, dispatch);
-  const { channels } = useSelector((state) => state.channels);
+  const { channels , channel } = useSelector((state) => state.channels);
   const { users } = useSelector((state) => state.users);
   const [showModalAddChannel, setShowModalAddChanel] = useState(false);
   const [showModalInvite, setShowModalInvite] = useState(false);
-  const [curremtIdOption, setCurremtIdOption] = useState();
+  const [currentIdOption, setCurrentIdOption] = useState();
   const [ homeEvent , setHomeEvent] = useState(false);
   const containerOptionRef = useRef();
   const currentUser = users.find((user) => user.id === sessionId);
@@ -28,25 +28,33 @@ const ChannelList = () => {
     currentUser &&
     channels.filter((channel) => channel.members.includes(sessionId));
 
+  const currentChannel = useMemo(() => {
+       return channels?.find((x) => x.id === channel.id) ?? null
+  },[channel.id, channels])
+
   useEffect(() => {
     const unListen = (e) => {
       const checkInBarInfo = e.composedPath().some(
         (p) => p === containerOptionRef.current
       );
       if (!checkInBarInfo) {
-        setCurremtIdOption(null);
+        setCurrentIdOption(null);
       }
     };
     window.addEventListener("click", unListen);
     return () => {
       window.removeEventListener("click", unListen);
     };
-  }, [curremtIdOption]);
+  }, [currentIdOption]);
 
-  // Handle show options channels\
+  useEffect(() => {
+     if(!currentChannel?.members.includes(sessionId) && channel) {
+       navigate("/channels/@me");
+    }
+  },[channel, channel.id, channel.members, channelFilter, currentChannel?.members, currentUser, navigate, sessionId, setChannel])
 
   const handleSelectChannel = (channel) => {
-    setCurremtIdOption(null); //left click
+    setCurrentIdOption(null); //left click
     setRoom({});
     setChannel(channel);
     navigate("/channels/" + channel.id);
@@ -57,7 +65,7 @@ const ChannelList = () => {
     if ( e.nativeEvent.button === 0){
       navigate("/channels/@me") 
     }else if ( e.nativeEvent.button === 2) {
-      setCurremtIdOption(id); //right click
+      setCurrentIdOption(id); //right click
     }
   };
 
@@ -71,7 +79,6 @@ const ChannelList = () => {
   const onMouseUp = () => {
     setHomeEvent(false)
 }
-
 
   return (
     <div className="lg:w-[4.5%] w-[15%] lg:block lg:px-0 bg-[#202225]">
@@ -116,7 +123,7 @@ const ChannelList = () => {
           </div>
             <ShowOptionChannel
               setShowModalInvite={setShowModalInvite}
-              curremtIdOption={curremtIdOption}
+              currentIdOption={currentIdOption}
               channel={channel}
               ref={containerOptionRef}
             />

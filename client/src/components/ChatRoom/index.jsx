@@ -1,8 +1,8 @@
 import clsx from 'clsx'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { FaBars, FaUserFriends } from 'react-icons/fa'
 import { TbMessagePlus } from 'react-icons/tb'
-import { IoIosSave } from 'react-icons/io'
+import { IoIosGitPullRequest, IoIosSave } from 'react-icons/io'
 import {  BiHelpCircle } from 'react-icons/bi'
 import { HiStatusOnline, HiUserAdd } from 'react-icons/hi'
 // import { GoRequestChanges } from 'react-icons/go'
@@ -23,13 +23,11 @@ const ChatRoom = () => {
     const [onlineList , setOnlineList ] = useState(true)
     const [allList , setAllList ] = useState(false)
     const [ requestList , setRequestList ] = useState(false)
-    const [ myRequest , setMyRequest ] = useState(null)
     const [ showModalAddFriends , setShowModalAddFriends ] = useState(false)
 
-    useState(() => {
-         const results = requests.filter(request => request.to === sessionId)
-         setMyRequest(results.length) 
-    },[requests])
+    const countRequest = useMemo(() => {
+        return requests.filter(request => request.to === sessionId)?.length ?? 0
+    },[requests, sessionId])
 
 
     const handleShowAllList = () => {
@@ -81,9 +79,9 @@ const ChatRoom = () => {
         <div onClick={handleShowRequestList} className={clsx({ "bg-[#42464d]" : requestList }, "text-sm px-2 py-1  hover:bg-[#42464d] rounded-md")}>
             <div className="flex gap-2">
             <span className="lg:block hidden text-gray-300 cursor-pointer ">Requests</span>
-            {/* <GoRequestChanges className="lg:hidden block text-white text-[20px]" /> */}
-            {myRequest > 0 && 
-            <span className="text-[#fff] bg-[#ed4245] w-[18px] h-[18px] text-center text-xs mt-0 p-[1px] rounded-full">{myRequest}</span>
+            <IoIosGitPullRequest  className="lg:hidden block text-white text-[20px]" />
+            {countRequest > 0 && 
+            <span className="text-[#fff] bg-[#ed4245] w-[18px] h-[18px] text-center text-xs mt-0 p-[1px] rounded-full">{countRequest}</span>
             }
             </div>
         </div>
@@ -108,7 +106,7 @@ const ChatRoom = () => {
        <AllFriends />
      }
      {requestList && 
-        <Request  setMyRequest={setMyRequest}/>
+        <Request />
        }
     </div>
     <div className="lg:w-[25%] lg:block hidden bg-[#36393f]">

@@ -11,7 +11,7 @@ const channelReducers = (state = inittialState, { type, payload }) => {
     case ActionType.FETCH_CHANNELS:
       return {
         ...state,
-        channels: payload,
+        channels: [...payload],
       };
     case ActionType.SET_CHANNEL:
       return {

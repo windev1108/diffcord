@@ -3,6 +3,7 @@ import { ActionType } from '../actions/action-types'
 const inittialState = {
     users : [],
     user : {},
+    authUser: {}
 }
 
 
@@ -18,6 +19,11 @@ const userReducers = (state = inittialState, {type , payload }) => {
           return {
             ...state,
             user: payload
+          }  
+     case ActionType.SET_AUTH_USER:
+          return {
+            ...state,
+            authUser: payload
           }  
       default:
           return state

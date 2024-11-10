@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { bindActionCreators } from "redux";
@@ -11,10 +11,10 @@ const ShowOptionChannel = (props, ref) => {
   const navigate = useNavigate();
   const sessionId = sessionStorage.getItem("sessionId");
   const { setChannel } = bindActionCreators(actionCreator, dispatch);
-  const { channel, curremtIdOption, setShowModalInvite } = props;
-  const { users } = useSelector((state) => state.users);
-  const curentUser = users && users.find((user) => user.id === sessionId);
-
+  const { channel, currentIdOption, setShowModalInvite } = props;
+  const { users , authUser } = useSelector((state) => state.users);
+  const { channels } = useSelector((state) => state.channels);
+  const currentUser = users && users.find((user) => user.id === sessionId);
   const handleDeleteChanel = (channel) => {
     deleteChannel(channel.id);
     navigate("/channels/@me");
@@ -22,18 +22,14 @@ const ShowOptionChannel = (props, ref) => {
 
   const handleLeaveChannel = (channel) => {
     const formChannel = {
-      ...channel,
       members: channel.members.replace(sessionId, ""),
     };
     const formUser = {
-      ...curentUser,
-      channels: curentUser.channels.replace(channel.channelId, ""),
+      channels: currentUser.channels.replace(channel.channelId, ""),
     };
-    navigate("/channels/@me");
     updateChannel(formChannel, channel.id);
-    updateUser(formUser, curentUser.id);
+    updateUser(formUser, currentUser.id);
   };
-
   //  handle  invite
   const handleInvite = () => {
     setShowModalInvite(true);
@@ -45,8 +41,8 @@ const ShowOptionChannel = (props, ref) => {
       ref={ref}
       className={clsx(
         {
-          block: curremtIdOption === channel.id,
-          hidden: curremtIdOption !== channel.id,
+          block: currentIdOption === channel.id,
+          hidden: currentIdOption !== channel.id,
         },
         "absolute rounded-md top-0 right-[-11rem] w-[10rem] bg-[#18191c] p-1 z-10 shadow-sm shadow-[#343333]"
       )}

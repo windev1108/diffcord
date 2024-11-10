@@ -20,7 +20,7 @@ import { bindActionCreators } from "redux";
 import { actionCreator } from "../../redux";
 import clsx from "clsx";
 import { serverTimestamp } from "firebase/firestore";
-import { destroyImage, uploadImage } from "../../apis/cloudinary";
+import { uploadImage } from "../../apis/cloudinary";
 import ModalSettingProfile from './modalSettingProfile'
 import { MEDIA_SUPPORT } from "../../utils/constants";
 
@@ -34,8 +34,6 @@ const Modal = ({ setModal, user }) => {
   const { users } = useSelector((state) => state.users);
   const [currentUser, setCurrentUser] = useState({});
   const [myRequest, setMyRequest] = useState([]);
-  const [note, setNote] = useState("");
-  const [nickname , setNickname] = useState("");
   const [percent, setPercent] = useState(0);
   const [ loading , setLoading ] = useState(false)
 
@@ -136,7 +134,7 @@ const Modal = ({ setModal, user }) => {
             className="flex justify-end h-full"
           >
             {user.id === sessionId && (
-              <ModalSettingProfile user={user} >
+              <ModalSettingProfile user={user}>
                 <button>
                 <BsFillPencilFill className="bg-black bg-opacity-30 text-white mt-3 mr-3 rounded-full  text-4xl p-1 cursor-pointer" />
                 </button>
@@ -146,7 +144,9 @@ const Modal = ({ setModal, user }) => {
 
           <div className="absolute top-[3.5rem] left-[1.5rem]">
             <label onChange={handleChangeAvatar} htmlFor="changeAvatar" title='Upload avatar'>
-            <input hidden id="changeAvatar" type="file" accept="image/*" />
+              {sessionId === user?.id &&
+               <input hidden id="changeAvatar" type="file" accept="image/*" />
+              }
             {currentUser.avatar && currentUser.avatar.includes(typeImage) ? (
                 <img
                   className="border-[8px] border-[#18191c] text-white w-[140px] h-[140px] rounded-full cursor-pointer"
